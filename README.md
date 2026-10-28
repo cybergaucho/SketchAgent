@@ -22,10 +22,12 @@
 >  SketchAgent leverages an off-the-shelf multimodal LLM to facilitate language-driven, sequential sketch generation through an intuitive sketching language. It can sketch diverse concepts, engage in interactive sketching with humans, and edit content via chat.
 </p>
 
+**Fork note:** This is a fork of the original repo with multi-provider support added to `gen_sketch.py` (Anthropic, OpenAI, or OpenRouter). Ideal for free testing with OpenRouter's free vision models. The collaborative (`collab_sketch.py`) and chat-edit interfaces still use Anthropic by default and would need similar adaptation for other providers.
+
 ## Setup
 Clone the repository and navigate to the project folder:
 ```
-git clone https://github.com/yael-vinker/SketchAgent.git
+git clone https://github.com/cybergaucho/SketchAgent.git
 cd SketchAgent
 ```
 Set up the environment:
@@ -44,32 +46,59 @@ If python flashes a warning at you, try reinstalling `cairosvg`:
 conda uninstall cairosvg && conda install cairosvg
 ```
 
-#### API Key
-This repository requires an Anthropic API key. If you don't have one, [create an Anthropic account](https://console.anthropic.com/login) and follow the instructions to obtain a key.
+#### API Keys
+`gen_sketch.py` supports multiple providers via the `--provider` flag.
 
-Once you have the key, save it in the ```.env``` file:
+**Recommended for free testing: OpenRouter**
+1. Sign up at [openrouter.ai](https://openrouter.ai) (no credit card required for free tier).
+2. Create an API key in the dashboard.
+3. Add to your `.env` file:
 ```
-ANTHROPIC_API_KEY=<your_key>
+OPENROUTER_API_KEY=sk-or-v1-...
+```
+
+Free tier limits: ~50 requests/day (20/min). Rises to 1,000/day after a one-time $10 credit purchase. Free models end in `:free`.
+
+**Vision-capable free models** (as of late Oct 2026; list changes — check openrouter.ai):
+- `google/gemma-4-31b-it:free` (262K context, image/text/video) — good default
+- `google/gemma-4-26b-a4b-it:free` (similar, smaller active params)
+- `thinkingmachines/inkling:free` or `inkling-small:free` (1M+ context, image/text/audio)
+- `nvidia/nemotron-3.5-super-vl:free` (1M context, image/text/video)
+- `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` (256K, multi-modal)
+- `dots-studio/dots-3-note-preview:free` (512K, image/text)
+- `openrouter/free` (auto-router that picks a suitable free model, including vision when needed)
+
+For Anthropic (original):
+```
+ANTHROPIC_API_KEY=...
+```
+For OpenAI:
+```
+OPENAI_API_KEY=...
 ```
 
 # Start Sketching! :woman_artist: :art:
-## Text-to-Sketch
+## Text-to-Sketch (recommended starting point)
 Generate a single sketch by running:
 ```
-python gen_sketch.py --concept_to_draw "<your_concept_here>" 
+python gen_sketch.py --concept_to_draw "<your_concept_here>" --provider openrouter --model google/gemma-4-31b-it:free
 ```
 For example:
 ```
-python gen_sketch.py --concept_to_draw "sailboat" 
+python gen_sketch.py --concept_to_draw "sailboat" --provider openrouter --model google/gemma-4-31b-it:free
 ```
 
+If you leave `--model` as the default Claude name and use `--provider openrouter`, it auto-falls back to the Gemma free model.
+
 Optional arguments:
+* ```--provider``` `anthropic` (default), `openai`, or `openrouter`
+* ```--model``` Specific model ID (must support vision for best results with the grid image)
 * ```--seed_mode``` Default is ```"deterministic"``` for reproducible results. Set to ```"stochastic"``` for increased variability.
 * ```--path2save``` By default, results are saved to ```results/test/```.
 
 ## Collaborative Sketching
 Collaborate with SketchAgent by alternating strokes! 
-To use the interactive interface:
+To use the interactive interface (still Anthropic-only in this fork):
 ```
 python collab_sketch.py
 ```
@@ -86,7 +115,7 @@ Use the text box to change the concept to be drawn.
 <p align="center">
 <img src="repo_images/interface.png" width="90%"/>  
 
-Interact with SketchAgent through natural language to edit existing sketches! To use the chat-based editing interface:
+Interact with SketchAgent through natural language to edit existing sketches! To use the chat-based editing interface (Anthropic-only):
 
 ```bash
 python chat_and_edit.py
@@ -139,14 +168,17 @@ Use **SSH port forwarding** to access the app from your local browser:
 
 
 ## Tips:
-* The ```gen_sketch.py``` script produces sketches with variability. Try running it multiple times to explore different outcomes.
+* The ```gen_sketch.py``` script produces sketches with variability. Try running it multiple times to explore different outcomes. Free models may need a few tries or clearer prompts.
 * Prompts are available in the ```prompts.py file```. For unique concepts, ensure that your input prompt is clear and meaningful.
+* Vision support is important because the system can optionally send a grid canvas image. Free multimodal models work best.
+* Rate limits on free OpenRouter models are low — perfect for testing sketches, not production.
 
 ## TODOs
 
 - [ ] Add support for chat based editing.
 - [ ] Add SVG drawing process animations in HTML.
-- [ ] Add support of other backbone models (GPT4o, LLama3).
+- [x] Add support of other backbone models (OpenAI, OpenRouter free vision models).
+- [ ] Port multi-provider support to collab_sketch.py and chat_and_edit.py.
 
 ## Citation
 If you find this useful for your research, please cite the following:
