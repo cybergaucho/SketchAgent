@@ -78,7 +78,14 @@ OPENAI_API_KEY=...
 ```
 
 # Start Sketching! :woman_artist: :art:
-## Text-to-Sketch (recommended starting point)
+## Playground (easiest way to test)
+A simple web UI where you enter a concept and instantly see the sketch:
+```
+python playground.py
+```
+Open http://127.0.0.1:5000 in your browser. Defaults to OpenRouter free models. Results appear inline with download links for PNG/SVG. Saved under `results/playground/`.
+
+## Text-to-Sketch (CLI)
 Generate a single sketch by running:
 ```
 python gen_sketch.py --concept_to_draw "<your_concept_here>" --provider openrouter --model google/gemma-4-31b-it:free
@@ -140,7 +147,7 @@ results/api_{timestamp}_{session_id}
 
 ---
 
-### 🧑‍💻 Accessing the Interface
+### 👨‍💻 Accessing the Interface
 
 #### ✅ If Running Locally:
 
@@ -172,12 +179,14 @@ Use **SSH port forwarding** to access the app from your local browser:
 * Prompts are available in the ```prompts.py file```. For unique concepts, ensure that your input prompt is clear and meaningful.
 * Vision support is important because the system can optionally send a grid canvas image. Free multimodal models work best.
 * Rate limits on free OpenRouter models are low — perfect for testing sketches, not production.
+* The playground is the quickest way to experiment with different concepts for learning illustrations.
 
 ## TODOs
 
 - [ ] Add support for chat based editing.
 - [ ] Add SVG drawing process animations in HTML.
 - [x] Add support of other backbone models (OpenAI, OpenRouter free vision models).
+- [x] Simple playground web UI for testing prompts.
 - [ ] Port multi-provider support to collab_sketch.py and chat_and_edit.py.
 
 ## Citation
